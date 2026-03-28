@@ -1,12 +1,5 @@
-// import app from './app.js';
-// import { config } from './config.js';
-
-// app.listen(config.port, () => {
-//   console.log(`API running on http://localhost:${config.port}`);
-// });
-
 import 'dotenv/config';
-import app from './app.js'; // .js extension required for NodeNext ESM resolution
+import app from './app.js';
 
 const bootstrap = () => {
   try {

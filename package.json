@@ -5,15 +5,14 @@
   "main": "index.js",
   "scripts": {
     "dev": "tsx watch src/server.ts",
-    "build": "tsc --project tsconfig.json",
-    "typecheck": "tsc --noEmit --project tsconfig.json",
+    "lint": "eslint ./src/**/*.{ts,tsx}",
+    "build": "tsc",
     "start": "node dist/server.js",
-    "lint": "eslint ./src/**/*.ts",
+    "studio": "prisma studio",
     "migrate": "prisma migrate dev",
     "generate": "prisma generate",
-    "studio": "prisma studio",
-    "push": "prisma db push",
-    "pull": "prisma db pull"
+    "push": "prisma push",
+    "pull": "prisma pull"
   },
   "repository": {
     "type": "git",
@@ -29,28 +28,20 @@
   "homepage": "https://github.com/Code5linger/cinetube-backend#readme",
   "devDependencies": {
     "@eslint/js": "^10.0.1",
-    "@types/bcryptjs": "^2.4.6",
-    "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
-    "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^25.5.0",
     "@types/pg": "^8.20.0",
     "eslint": "^10.1.0",
-    "nodemon": "^3.1.0",
-    "prisma": "^6.19.2",
+    "prisma": "^7.6.0",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.57.2"
   },
   "dependencies": {
     "@prisma/adapter-pg": "^7.6.0",
-    "@prisma/client": "^6.19.2",
-    "bcryptjs": "^2.4.3",
-    "cors": "^2.8.5",
+    "@prisma/client": "^7.6.0",
     "dotenv": "^17.3.1",
     "express": "^5.2.1",
-    "jsonwebtoken": "^9.0.2",
-    "pg": "^8.20.0",
-    "stripe": "^21.0.1"
+    "pg": "^8.20.0"
   }
 }
