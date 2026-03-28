@@ -1,38 +1,66 @@
 import { Request, Response } from 'express';
 import { asyncHandler } from '../../utils/http.js';
-import * as mediaService from './media.service.js';
+import { ICreateMediaPayload, IUpdateMediaPayload } from './media.interface.js';
+import { MediaService } from './media.services.js';
 
-export const getAll = asyncHandler(async (req: Request, res: Response) => {
-  const { search, genre, platform, year, sort } = req.query as Record<
-    string,
-    string
-  >;
-  const media = await mediaService.getAllMedia({
-    search,
-    genre,
-    platform,
-    year,
-    sort,
+const getAll = asyncHandler(async (req: Request, res: Response) => {
+  const media = await MediaService.getAllMedia({
+    search: req.query.search ? String(req.query.search) : undefined,
+    genre: req.query.genre ? String(req.query.genre) : undefined,
+    platform: req.query.platform ? String(req.query.platform) : undefined,
+    year: req.query.year ? String(req.query.year) : undefined,
+    sort: req.query.sort ? String(req.query.sort) : undefined,
   });
-  res.json(media);
+  res.json({
+    success: true,
+    message: 'Media retrieved successfully',
+    data: media,
+  });
 });
 
-export const getOne = asyncHandler(async (req: Request, res: Response) => {
-  const media = await mediaService.getMediaById(req.params.id);
-  res.json(media);
+const getOne = asyncHandler(async (req: Request, res: Response) => {
+  const media = await MediaService.getMediaById(String(req.params.id));
+  res.json({
+    success: true,
+    message: 'Media retrieved successfully',
+    data: media,
+  });
 });
 
-export const create = asyncHandler(async (req: Request, res: Response) => {
-  const media = await mediaService.createMedia(req.body);
-  res.status(201).json(media);
+const create = asyncHandler(async (req: Request, res: Response) => {
+  const media = await MediaService.createMedia(req.body as ICreateMediaPayload);
+  res.status(201).json({
+    success: true,
+    message: 'Media created successfully',
+    data: media,
+  });
 });
 
-export const update = asyncHandler(async (req: Request, res: Response) => {
-  const media = await mediaService.updateMedia(req.params.id, req.body);
-  res.json(media);
+const update = asyncHandler(async (req: Request, res: Response) => {
+  const media = await MediaService.updateMedia(
+    String(req.params.id),
+    req.body as IUpdateMediaPayload,
+  );
+  res.json({
+    success: true,
+    message: 'Media updated successfully',
+    data: media,
+  });
 });
 
-export const remove = asyncHandler(async (req: Request, res: Response) => {
-  await mediaService.deleteMedia(req.params.id);
-  res.json({ message: 'Deleted' });
+const remove = asyncHandler(async (req: Request, res: Response) => {
+  await MediaService.deleteMedia(String(req.params.id));
+  res.json({
+    success: true,
+    message: 'Media deleted successfully',
+    data: null,
+  });
 });
+
+export const MediaController = {
+  getAll,
+  getOne,
+  create,
+  update,
+  remove,
+};

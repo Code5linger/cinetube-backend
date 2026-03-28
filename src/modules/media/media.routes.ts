@@ -1,26 +1,21 @@
 import { Router } from 'express';
 import { requireAuth, requireRole } from '../../middleware/auth.js';
-import * as mediaController from './media.controller.js';
+import { MediaController } from './media.controller.js';
 
-export const mediaRouter = Router();
+const router = Router();
 
-mediaRouter.get('/', mediaController.getAll);
-mediaRouter.get('/:id', mediaController.getOne);
-mediaRouter.post(
-  '/',
-  requireAuth,
-  requireRole('ADMIN'),
-  mediaController.create,
-);
-mediaRouter.patch(
-  '/:id',
-  requireAuth,
-  requireRole('ADMIN'),
-  mediaController.update,
-);
-mediaRouter.delete(
-  '/:id',
-  requireAuth,
-  requireRole('ADMIN'),
-  mediaController.remove,
-);
+router.get('/', MediaController.getAll);
+router.get('/:id', MediaController.getOne);
+// router.post('/', requireAuth, requireRole('ADMIN'), MediaController.create);
+router.post('/', MediaController.create);
+router.patch('/:id', MediaController.update);
+// router.patch('/:id', requireAuth, requireRole('ADMIN'), MediaController.update);
+router.delete('/:id', MediaController.remove);
+// router.delete(
+//   '/:id',
+//   requireAuth,
+//   requireRole('ADMIN'),
+//   MediaController.remove,
+// );
+
+export const MediaRoutes = router;

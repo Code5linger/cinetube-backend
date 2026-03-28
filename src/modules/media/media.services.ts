@@ -1,14 +1,13 @@
 import { prisma } from '../../lib/prisma.js';
-// import { AppError } from '../../utils/http.js';
-// import { parseInteger, parseStringArray } from '../../utils/parse.js';
+import { AppError } from '../../utils/http.js';
+import { parseInteger, parseStringArray } from '../../utils/parse.js';
+import {
+  ICreateMediaPayload,
+  IMediaQuery,
+  IUpdateMediaPayload,
+} from './media.interface.js';
 
-export const getAllMedia = async (query: {
-  search?: string;
-  genre?: string;
-  platform?: string;
-  year?: string;
-  sort?: string;
-}) => {
+const getAllMedia = async (query: IMediaQuery) => {
   const { search, genre, platform, year, sort = 'latest' } = query;
 
   const where = {
@@ -39,7 +38,7 @@ export const getAllMedia = async (query: {
   });
 };
 
-export const getMediaById = async (id: string) => {
+const getMediaById = async (id: string) => {
   const media = await prisma.media.findUnique({
     where: { id },
     include: {
@@ -62,21 +61,24 @@ export const getMediaById = async (id: string) => {
   return media;
 };
 
-export const createMedia = async (body: {
-  title: string;
-  synopsis: string;
-  releaseYear: string | number;
-  director: string;
-  genres?: unknown;
-  cast?: unknown;
-  platforms?: unknown;
-  pricingType?: string;
-  streamUrl?: string;
-}) => {
-  const { title, synopsis, releaseYear, director, pricingType = 'FREE', streamUrl } = body;
+const createMedia = async (payload: ICreateMediaPayload) => {
+  const {
+    title,
+    synopsis,
+    releaseYear,
+    director,
+    pricingType = 'FREE',
+    streamUrl,
+    posterUrl,
+    thumbnailUrl,
+    mediaType = 'MOVIE',
+  } = payload;
 
   if (!title || !synopsis || !releaseYear || !director) {
-    throw new AppError('title, synopsis, releaseYear, and director are required', 422);
+    throw new AppError(
+      'title, synopsis, releaseYear, and director are required',
+      422,
+    );
   }
 
   return prisma.media.create({
@@ -85,13 +87,55 @@ export const createMedia = async (body: {
       synopsis,
       releaseYear: parseInteger(releaseYear, 'releaseYear'),
       director,
-      genres: parseStringArray(body.genres),
-      cast: parseStringArray(body.cast),
-      platforms: parseStringArray(body.platforms),
+      genres: parseStringArray(payload.genres),
+      cast: parseStringArray(payload.cast),
+      platforms: parseStringArray(payload.platforms),
       pricingType: pricingType as 'FREE' | 'PREMIUM',
-      streamUrl,
+      mediaType: mediaType as 'MOVIE' | 'SERIES',
+      streamUrl: streamUrl ?? null,
+      posterUrl: posterUrl ?? null,
+      thumbnailUrl: thumbnailUrl ?? null,
     },
   });
 };
 
-export const updateMedia = async (id: st
+const updateMedia = async (id: string, payload: IUpdateMediaPayload) => {
+  const data: Record<string, unknown> = {};
+
+  for (const key of [
+    'title',
+    'synopsis',
+    'director',
+    'pricingType',
+    'mediaType',
+  ] as const) {
+    if (payload[key] !== undefined) data[key] = payload[key];
+  }
+
+  // nullable string fields
+  for (const key of ['streamUrl', 'posterUrl', 'thumbnailUrl'] as const) {
+    if (payload[key] !== undefined) data[key] = payload[key] ?? null;
+  }
+
+  if (payload.releaseYear !== undefined)
+    data.releaseYear = parseInteger(payload.releaseYear, 'releaseYear');
+  if (payload.genres !== undefined)
+    data.genres = parseStringArray(payload.genres);
+  if (payload.cast !== undefined) data.cast = parseStringArray(payload.cast);
+  if (payload.platforms !== undefined)
+    data.platforms = parseStringArray(payload.platforms);
+
+  return prisma.media.update({ where: { id }, data });
+};
+
+const deleteMedia = async (id: string) => {
+  await prisma.media.delete({ where: { id } });
+};
+
+export const MediaService = {
+  getAllMedia,
+  getMediaById,
+  createMedia,
+  updateMedia,
+  deleteMedia,
+};
