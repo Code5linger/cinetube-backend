@@ -10,12 +10,12 @@ router.get('/:id', MediaController.getOne);
 router.post('/', MediaController.create);
 router.patch('/:id', MediaController.update);
 // router.patch('/:id', requireAuth, requireRole('ADMIN'), MediaController.update);
-router.delete('/:id', MediaController.remove);
-// router.delete(
-//   '/:id',
-//   requireAuth,
-//   requireRole('ADMIN'),
-//   MediaController.remove,
-// );
+// router.delete('/:id', MediaController.remove);
+router.delete(
+  '/:id',
+  requireAuth,
+  requireRole('ADMIN'),
+  MediaController.remove,
+);
 
 export const MediaRoutes = router;
