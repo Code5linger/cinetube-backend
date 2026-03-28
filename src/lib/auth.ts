@@ -7,6 +7,12 @@ export const auth = betterAuth({
   database: prismaAdapter(prisma, { provider: 'postgresql' }),
   secret: config.BETTER_AUTH_SECRET,
   baseURL: config.BETTER_AUTH_URL,
+  basePath: '/api/better-auth',
+  trustedOrigins: [
+    'http://localhost:3000',
+    'http://localhost:5000',
+    config.FRONTEND_URL,
+  ],
   session: {
     expiresIn: Number(config.BETTER_AUTH_SESSION_TOKEN_EXPIRES_IN),
     updateAge: Number(config.BETTER_AUTH_SESSION_TOKEN_UPDATE_AGE),
