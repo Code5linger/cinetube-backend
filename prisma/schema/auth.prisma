@@ -1,0 +1,62 @@
+model User {
+    id            String   @id
+    name          String
+    email         String   @unique
+    emailVerified Boolean
+    image         String?
+    createdAt     DateTime
+    updatedAt     DateTime
+
+    // ── Your custom fields ──
+    role      Role    @default(USER)
+    avatarUrl String?
+
+    // ── Your app relations ──
+    reviews      Review[]
+    comments     Comment[]
+    watchlist    Watchlist[]
+    likes        ReviewLike[]
+    payments     Payment[]
+    subscription Subscription?
+
+    sessions Session[]
+    accounts Account[]
+}
+
+model Session {
+    id        String   @id
+    expiresAt DateTime
+    token     String   @unique
+    createdAt DateTime
+    updatedAt DateTime
+    ipAddress String?
+    userAgent String?
+    userId    String
+    user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Account {
+    id                    String    @id
+    accountId             String
+    providerId            String
+    userId                String
+    user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+    accessToken           String?
+    refreshToken          String?
+    idToken               String?
+    accessTokenExpiresAt  DateTime?
+    refreshTokenExpiresAt DateTime?
+    scope                 String?
+    password              String? // hashed password for email/password auth
+    createdAt             DateTime
+    updatedAt             DateTime
+}
+
+model Verification {
+    id         String    @id
+    identifier String
+    value      String
+    expiresAt  DateTime
+    createdAt  DateTime?
+    updatedAt  DateTime?
+}

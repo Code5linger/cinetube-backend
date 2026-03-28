@@ -1,0 +1,30 @@
+// ─────────────────────────────────────────
+// ENUMS
+// ─────────────────────────────────────────
+
+enum Role {
+    USER
+    ADMIN
+}
+
+enum MediaType {
+    MOVIE
+    SERIES
+}
+
+enum PricingType {
+    FREE
+    PREMIUM
+}
+
+enum PaymentStatus {
+    PENDING
+    PAID
+    FAILED
+    REFUNDED
+}
+
+enum SubscriptionPlan {
+    MONTHLY
+    YEARLY
+}

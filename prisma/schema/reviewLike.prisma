@@ -1,0 +1,10 @@
+model ReviewLike {
+    id        String   @id @default(cuid())
+    reviewId  String
+    userId    String
+    review    Review   @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+    user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+    createdAt DateTime @default(now())
+
+    @@unique([reviewId, userId])
+}

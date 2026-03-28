@@ -1,0 +1,13 @@
+model Comment {
+    id        String    @id @default(cuid())
+    content   String
+    userId    String
+    reviewId  String
+    parentId  String?
+    user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+    review    Review    @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+    parent    Comment?  @relation("CommentReplies", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+    replies   Comment[] @relation("CommentReplies")
+    createdAt DateTime  @default(now())
+    updatedAt DateTime  @updatedAt
+}

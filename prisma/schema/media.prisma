@@ -1,0 +1,20 @@
+model Media {
+    id            String      @id @default(cuid())
+    title         String      @unique
+    mediaType     MediaType   @default(MOVIE)
+    synopsis      String
+    genres        String[]
+    releaseYear   Int
+    director      String
+    cast          String[]
+    platforms     String[]
+    pricingType   PricingType @default(FREE)
+    streamUrl     String?
+    posterUrl     String?
+    thumbnailUrl  String?
+    averageRating Float       @default(0)
+    reviews       Review[]
+    watchlisted   Watchlist[]
+    createdAt     DateTime    @default(now())
+    updatedAt     DateTime    @updatedAt
+}
