@@ -28,3 +28,13 @@ enum SubscriptionPlan {
     MONTHLY
     YEARLY
 }
+
+enum AccountStatus {
+    ACTIVE
+    BLOCKED
+}
+
+enum TitleAccessType {
+    PURCHASE
+    RENTAL
+}

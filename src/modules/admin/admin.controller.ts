@@ -89,6 +89,42 @@ const getMediaAnalytics = asyncHandler(async (_req: Request, res: Response) => {
   });
 });
 
+const getPendingComments = asyncHandler(async (_req: Request, res: Response) => {
+  const result = await AdminService.getPendingComments();
+  res.json({
+    success: true,
+    message: 'Pending comments fetched successfully',
+    data: result,
+  });
+});
+
+const approveComment = asyncHandler(async (req: Request, res: Response) => {
+  const result = await AdminService.approveComment(String(req.params.id));
+  res.json({
+    success: true,
+    message: 'Comment approved successfully',
+    data: result,
+  });
+});
+
+const unpublishComment = asyncHandler(async (req: Request, res: Response) => {
+  const result = await AdminService.unpublishComment(String(req.params.id));
+  res.json({
+    success: true,
+    message: 'Comment unpublished successfully',
+    data: result,
+  });
+});
+
+const deleteComment = asyncHandler(async (req: Request, res: Response) => {
+  await AdminService.deleteComment(String(req.params.id));
+  res.json({
+    success: true,
+    message: 'Comment deleted successfully',
+    data: null,
+  });
+});
+
 export const AdminController = {
   getDashboard,
   getAllUsers,
@@ -99,4 +135,8 @@ export const AdminController = {
   changeUserRole,
   deleteUser,
   getMediaAnalytics,
+  getPendingComments,
+  approveComment,
+  unpublishComment,
+  deleteComment,
 };

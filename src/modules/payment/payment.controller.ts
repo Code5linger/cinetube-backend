@@ -3,8 +3,14 @@ import { asyncHandler, AppError } from '../../utils/http.js';
 import { PaymentService } from './payment.service.js';
 // import { stripe } from '../../config/stripe.js';
 import { config } from '../../config/config.js';
-import { ICreateCheckoutSessionPayload } from './payment.interface.js';
-import { SubscriptionPlan } from '../../generated/prisma/index.js';
+import {
+  ICreateCheckoutSessionPayload,
+  ICreateTitleCheckoutPayload,
+} from './payment.interface.js';
+import {
+  SubscriptionPlan,
+  TitleAccessType,
+} from '../../generated/prisma/index.js';
 import { stripe } from '../../config/stripe.js';
 
 const createCheckoutSession = asyncHandler(
@@ -25,6 +31,34 @@ const createCheckoutSession = asyncHandler(
     res.status(201).json({
       success: true,
       message: 'Checkout session created successfully',
+      data: result,
+    });
+  },
+);
+
+const createTitleCheckoutSession = asyncHandler(
+  async (req: Request, res: Response) => {
+    const { mediaId, accessType } = req.body as ICreateTitleCheckoutPayload;
+
+    if (!mediaId || !accessType) {
+      throw new AppError('mediaId and accessType are required', 422);
+    }
+
+    if (!Object.values(TitleAccessType).includes(accessType)) {
+      throw new AppError(
+        `accessType must be one of: ${Object.values(TitleAccessType).join(', ')}`,
+        422,
+      );
+    }
+
+    const result = await PaymentService.createTitleCheckoutSession(
+      req.user!.id,
+      mediaId,
+      accessType,
+    );
+    res.status(201).json({
+      success: true,
+      message: 'Title checkout session created successfully',
       data: result,
     });
   },
@@ -90,10 +124,35 @@ const getAllPayments = asyncHandler(async (_req: Request, res: Response) => {
   });
 });
 
+const getMyTitleEntitlements = asyncHandler(
+  async (req: Request, res: Response) => {
+    const result = await PaymentService.getMyTitleEntitlements(req.user!.id);
+    res.json({
+      success: true,
+      message: 'Your purchases and rentals fetched successfully',
+      data: result,
+    });
+  },
+);
+
+const getAllTitleEntitlements = asyncHandler(
+  async (_req: Request, res: Response) => {
+    const result = await PaymentService.getAllTitleEntitlements();
+    res.json({
+      success: true,
+      message: 'All title entitlements fetched successfully',
+      data: result,
+    });
+  },
+);
+
 export const PaymentController = {
   createCheckoutSession,
+  createTitleCheckoutSession,
   handleStripeWebhook,
   getMyPayments,
   getMySubscription,
   getAllPayments,
+  getMyTitleEntitlements,
+  getAllTitleEntitlements,
 };

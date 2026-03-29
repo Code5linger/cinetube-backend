@@ -4,6 +4,12 @@ export interface IMediaQuery {
   platform?: string | undefined;
   year?: string | undefined;
   sort?: string | undefined;
+  page?: string | undefined;
+  limit?: string | undefined;
+  minRating?: string | undefined;
+  maxRating?: string | undefined;
+  /** If true, only titles flagged for Editor’s picks */
+  editorsPick?: string | undefined;
 }
 
 export interface ICreateMediaPayload {
@@ -15,6 +21,10 @@ export interface ICreateMediaPayload {
   cast?: unknown;
   platforms?: unknown;
   pricingType?: string;
+  editorsPick?: boolean;
+  purchasePrice?: number | string | null;
+  rentalPrice?: number | string | null;
+  rentalDurationDays?: string | number;
   streamUrl?: string;
   posterUrl?: string;
   thumbnailUrl?: string;
@@ -30,6 +40,10 @@ export interface IUpdateMediaPayload {
   cast?: unknown;
   platforms?: unknown;
   pricingType?: string;
+  editorsPick?: boolean;
+  purchasePrice?: number | string | null;
+  rentalPrice?: number | string | null;
+  rentalDurationDays?: string | number;
   streamUrl?: string;
   posterUrl?: string;
   thumbnailUrl?: string;

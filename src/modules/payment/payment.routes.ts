@@ -11,11 +11,21 @@ router.post('/webhook', PaymentController.handleStripeWebhook);
 
 // User routes
 router.post('/checkout', requireAuth, PaymentController.createCheckoutSession);
+router.post(
+  '/title-checkout',
+  requireAuth,
+  PaymentController.createTitleCheckoutSession,
+);
 router.get('/my-payments', requireAuth, PaymentController.getMyPayments);
 router.get(
   '/my-subscription',
   requireAuth,
   PaymentController.getMySubscription,
+);
+router.get(
+  '/my-entitlements',
+  requireAuth,
+  PaymentController.getMyTitleEntitlements,
 );
 
 // Admin routes
@@ -24,6 +34,12 @@ router.get(
   requireAuth,
   requireRole(Role.ADMIN),
   PaymentController.getAllPayments,
+);
+router.get(
+  '/title-entitlements/all',
+  requireAuth,
+  requireRole(Role.ADMIN),
+  PaymentController.getAllTitleEntitlements,
 );
 
 export const PaymentRoutes = router;

@@ -1,4 +1,4 @@
-import { Role } from '../generated/prisma/index.js';
+import { AccountStatus, Role } from '../generated/prisma/index.js';
 
 declare global {
   namespace Express {
@@ -8,6 +8,7 @@ declare global {
         name: string;
         email: string;
         role: Role;
+        accountStatus: AccountStatus;
       };
     }
   }

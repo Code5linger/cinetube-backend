@@ -4,22 +4,33 @@ import { ICreateMediaPayload, IUpdateMediaPayload } from './media.interface.js';
 import { MediaService } from './media.services.js';
 
 const getAll = asyncHandler(async (req: Request, res: Response) => {
-  const media = await MediaService.getAllMedia({
+  const result = await MediaService.getAllMedia({
     search: req.query.search ? String(req.query.search) : undefined,
     genre: req.query.genre ? String(req.query.genre) : undefined,
     platform: req.query.platform ? String(req.query.platform) : undefined,
     year: req.query.year ? String(req.query.year) : undefined,
     sort: req.query.sort ? String(req.query.sort) : undefined,
+    page: req.query.page ? String(req.query.page) : undefined,
+    limit: req.query.limit ? String(req.query.limit) : undefined,
+    minRating: req.query.minRating ? String(req.query.minRating) : undefined,
+    maxRating: req.query.maxRating ? String(req.query.maxRating) : undefined,
+    editorsPick: req.query.editorsPick
+      ? String(req.query.editorsPick)
+      : undefined,
   });
   res.json({
     success: true,
     message: 'Media retrieved successfully',
-    data: media,
+    data: result.items,
+    pagination: result.pagination,
   });
 });
 
 const getOne = asyncHandler(async (req: Request, res: Response) => {
-  const media = await MediaService.getMediaById(String(req.params.id));
+  const media = await MediaService.getMediaById(
+    String(req.params.id),
+    req.user?.id,
+  );
   res.json({
     success: true,
     message: 'Media retrieved successfully',

@@ -23,4 +23,10 @@ router.patch('/reviews/:id/approve', AdminController.approveReview);
 router.patch('/reviews/:id/unpublish', AdminController.unpublishReview);
 router.delete('/reviews/:id', AdminController.deleteReview);
 
+// Comment moderation
+router.get('/comments/pending', AdminController.getPendingComments);
+router.patch('/comments/:id/approve', AdminController.approveComment);
+router.patch('/comments/:id/unpublish', AdminController.unpublishComment);
+router.delete('/comments/:id', AdminController.deleteComment);
+
 export const AdminRoutes = router;

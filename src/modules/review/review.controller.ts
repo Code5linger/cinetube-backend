@@ -4,16 +4,44 @@ import { ReviewService } from './review.service.js';
 import {
   ICreateCommentPayload,
   ICreateReviewPayload,
+  IReviewQuery,
   IUpdateReviewPayload,
 } from './review.interface.js';
 import { Role } from '../../generated/prisma/index.js';
 
-const getAllReviews = asyncHandler(async (_req: Request, res: Response) => {
-  const reviews = await ReviewService.getAllReviews();
+const getAllReviews = asyncHandler(async (req: Request, res: Response) => {
+  const query: IReviewQuery = {
+    ...(req.query.page != null && String(req.query.page) !== ''
+      ? { page: String(req.query.page) }
+      : {}),
+    ...(req.query.limit != null && String(req.query.limit) !== ''
+      ? { limit: String(req.query.limit) }
+      : {}),
+    ...(req.query.sort != null && String(req.query.sort) !== ''
+      ? { sort: String(req.query.sort) }
+      : {}),
+    ...(req.query.genre != null && String(req.query.genre) !== ''
+      ? { genre: String(req.query.genre) }
+      : {}),
+    ...(req.query.platform != null && String(req.query.platform) !== ''
+      ? { platform: String(req.query.platform) }
+      : {}),
+    ...(req.query.minRating != null && String(req.query.minRating) !== ''
+      ? { minRating: String(req.query.minRating) }
+      : {}),
+    ...(req.query.maxRating != null && String(req.query.maxRating) !== ''
+      ? { maxRating: String(req.query.maxRating) }
+      : {}),
+    ...(req.query.mediaId != null && String(req.query.mediaId) !== ''
+      ? { mediaId: String(req.query.mediaId) }
+      : {}),
+  };
+  const result = await ReviewService.getAllReviews(query);
   res.json({
     success: true,
     message: 'Reviews retrieved successfully',
-    data: reviews,
+    data: result.items,
+    pagination: result.pagination,
   });
 });
 
@@ -76,7 +104,7 @@ const createComment = asyncHandler(async (req: Request, res: Response) => {
   );
   res.status(201).json({
     success: true,
-    message: 'Comment added successfully',
+    message: 'Comment submitted; pending moderation',
     data: comment,
   });
 });

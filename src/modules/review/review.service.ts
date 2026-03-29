@@ -1,23 +1,86 @@
 import { prisma } from '../../lib/prisma.js';
 import { AppError } from '../../utils/http.js';
-import { parseInteger, parseStringArray } from '../../utils/parse.js';
+import {
+  parseInteger,
+  parseOptionalFloat,
+  parsePagination,
+  parseStringArray,
+} from '../../utils/parse.js';
 import {
   ICreateCommentPayload,
   ICreateReviewPayload,
+  IReviewQuery,
   IUpdateReviewPayload,
 } from './review.interface.js';
 import { Role } from '../../generated/prisma/index.js';
 
-const getAllReviews = async () => {
-  return prisma.review.findMany({
-    where: { isPublished: true },
-    include: {
-      user: { select: { id: true, name: true } },
-      media: { select: { id: true, title: true } },
-      _count: { select: { comments: true, likes: true } },
+const getAllReviews = async (query: IReviewQuery) => {
+  const {
+    sort: sortRaw,
+    genre,
+    platform,
+    mediaId,
+    minRating,
+    maxRating,
+    page: pageRaw,
+    limit: limitRaw,
+  } = query;
+
+  const sort = sortRaw ?? 'recent';
+  const { page, limit, skip } = parsePagination(pageRaw, limitRaw);
+
+  const minR = parseOptionalFloat(minRating, 'minRating');
+  const maxR = parseOptionalFloat(maxRating, 'maxRating');
+  if (minR !== undefined && maxR !== undefined && minR > maxR) {
+    throw new AppError('minRating cannot exceed maxRating', 422);
+  }
+
+  const ratingFilter: { gte?: number; lte?: number } = {};
+  if (minR !== undefined) ratingFilter.gte = minR;
+  if (maxR !== undefined) ratingFilter.lte = maxR;
+
+  const mediaNested: { genres?: object; platforms?: object } = {};
+  if (genre) mediaNested.genres = { has: genre };
+  if (platform) mediaNested.platforms = { has: platform };
+
+  const where = {
+    isPublished: true,
+    ...(mediaId ? { mediaId } : {}),
+    ...(Object.keys(ratingFilter).length ? { rating: ratingFilter } : {}),
+    ...(Object.keys(mediaNested).length ? { media: mediaNested } : {}),
+  };
+
+  const orderBy =
+    sort === 'top_rated'
+      ? { rating: 'desc' as const }
+      : sort === 'most_liked'
+        ? { likes: { _count: 'desc' as const } }
+        : { createdAt: 'desc' as const };
+
+  const [items, total] = await Promise.all([
+    prisma.review.findMany({
+      where,
+      include: {
+        user: { select: { id: true, name: true } },
+        media: { select: { id: true, title: true } },
+        _count: { select: { comments: true, likes: true } },
+      },
+      orderBy,
+      skip,
+      take: limit,
+    }),
+    prisma.review.count({ where }),
+  ]);
+
+  return {
+    items,
+    pagination: {
+      page,
+      limit,
+      total,
+      totalPages: Math.max(1, Math.ceil(total / limit)),
     },
-    orderBy: { createdAt: 'desc' },
-  });
+  };
 };
 
 const createReview = async (payload: ICreateReviewPayload, userId: string) => {
@@ -130,12 +193,12 @@ const createComment = async (
       userId,
       content,
       parentId: parentId ?? null,
+      isPublished: false,
     },
     include: { user: { select: { id: true, name: true } } },
   });
 };
 
-// Admin only
 const approveReview = async (reviewId: string) => {
   const review = await prisma.review.findUnique({ where: { id: reviewId } });
   if (!review) throw new AppError('Review not found', 404);

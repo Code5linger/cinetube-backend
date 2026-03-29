@@ -28,6 +28,7 @@ export const auth = betterAuth({
     additionalFields: {
       role: { type: 'string', defaultValue: 'USER' },
       avatarUrl: { type: 'string', required: false },
+      accountStatus: { type: 'string', defaultValue: 'ACTIVE' },
     },
   },
 });

@@ -8,16 +8,18 @@ model User {
     updatedAt     DateTime
 
     // ── Your custom fields ──
-    role      Role    @default(USER)
-    avatarUrl String?
+    role          Role          @default(USER)
+    avatarUrl     String?
+    accountStatus AccountStatus @default(ACTIVE)
 
     // ── Your app relations ──
-    reviews      Review[]
-    comments     Comment[]
-    watchlist    Watchlist[]
-    likes        ReviewLike[]
-    payments     Payment[]
-    subscription Subscription?
+    reviews           Review[]
+    comments          Comment[]
+    watchlist         Watchlist[]
+    likes             ReviewLike[]
+    payments          Payment[]
+    subscription      Subscription?
+    titleEntitlements TitleEntitlement[]
 
     sessions Session[]
     accounts Account[]

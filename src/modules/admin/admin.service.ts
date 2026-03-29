@@ -4,6 +4,7 @@ import {
   IChangeUserRolePayload,
   IChangeUserStatusPayload,
 } from './admin.interface.js';
+import { AccountStatus } from '../../generated/prisma/index.js';
 
 const recomputeAverageRating = async (mediaId: string) => {
   const agg = await prisma.review.aggregate({
@@ -60,6 +61,7 @@ const getAllUsers = async () => {
       name: true,
       email: true,
       role: true,
+      accountStatus: true,
       emailVerified: true,
       image: true,
       createdAt: true,
@@ -107,10 +109,14 @@ const changeUserStatus = async (
   payload: IChangeUserStatusPayload,
   requestingUserId: string,
 ) => {
-  const { userId } = payload;
+  const { userId, status } = payload;
 
   if (userId === requestingUserId) {
     throw new AppError('You cannot change your own status', 400);
+  }
+
+  if (!Object.values(AccountStatus).includes(status)) {
+    throw new AppError('Invalid account status', 422);
   }
 
   const user = await prisma.user.findUnique({ where: { id: userId } });
@@ -118,8 +124,14 @@ const changeUserStatus = async (
 
   return prisma.user.update({
     where: { id: userId },
-    data: { role: user.role },
-    select: { id: true, name: true, email: true, role: true },
+    data: { accountStatus: status },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      role: true,
+      accountStatus: true,
+    },
   });
 };
 
@@ -167,6 +179,47 @@ const getMediaAnalytics = async () => {
   });
 };
 
+const getPendingComments = async () => {
+  return prisma.comment.findMany({
+    where: { isPublished: false },
+    include: {
+      user: { select: { id: true, name: true, email: true } },
+      review: {
+        select: {
+          id: true,
+          content: true,
+          media: { select: { id: true, title: true } },
+        },
+      },
+    },
+    orderBy: { createdAt: 'asc' },
+  });
+};
+
+const approveComment = async (commentId: string) => {
+  const c = await prisma.comment.findUnique({ where: { id: commentId } });
+  if (!c) throw new AppError('Comment not found', 404);
+  return prisma.comment.update({
+    where: { id: commentId },
+    data: { isPublished: true },
+  });
+};
+
+const unpublishComment = async (commentId: string) => {
+  const c = await prisma.comment.findUnique({ where: { id: commentId } });
+  if (!c) throw new AppError('Comment not found', 404);
+  return prisma.comment.update({
+    where: { id: commentId },
+    data: { isPublished: false },
+  });
+};
+
+const deleteComment = async (commentId: string) => {
+  const c = await prisma.comment.findUnique({ where: { id: commentId } });
+  if (!c) throw new AppError('Comment not found', 404);
+  await prisma.comment.delete({ where: { id: commentId } });
+};
+
 export const AdminService = {
   getDashboard,
   getAllUsers,
@@ -177,4 +230,8 @@ export const AdminService = {
   changeUserRole,
   deleteUser,
   getMediaAnalytics,
+  getPendingComments,
+  approveComment,
+  unpublishComment,
+  deleteComment,
 };

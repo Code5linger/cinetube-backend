@@ -1,0 +1,17 @@
+model TitleEntitlement {
+    id                   String          @id @default(cuid())
+    userId               String
+    mediaId              String
+    accessType           TitleAccessType
+    amount               Float
+    currency             String          @default("usd")
+    status               PaymentStatus   @default(PENDING)
+    checkoutSessionId    String?         @unique
+    stripeWebhookEventId String?         @unique
+    expiresAt            DateTime?
+    user                 User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+    media                Media           @relation(fields: [mediaId], references: [id], onDelete: Cascade)
+    createdAt            DateTime        @default(now())
+
+    @@index([userId, mediaId])
+}
