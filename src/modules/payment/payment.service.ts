@@ -141,6 +141,11 @@ async function fulfillSubscriptionCheckout(
   session: Stripe.Checkout.Session,
   eventId: string,
 ) {
+  console.log('fulfillSubscriptionCheckout called');
+  console.log('session.id:', session.id);
+  console.log('session.payment_status:', session.payment_status);
+  console.log('session.metadata:', session.metadata);
+
   const userId = session.metadata?.userId;
   const plan = session.metadata?.plan as SubscriptionPlan;
   if (!userId || !plan) {
@@ -150,26 +155,19 @@ async function fulfillSubscriptionCheckout(
 
   const pay = await tx.payment.findFirst({
     where: {
-      OR: [
-        { checkoutSessionId: session.id },
-        { gatewayTxnId: session.id },
-      ],
+      OR: [{ checkoutSessionId: session.id }, { gatewayTxnId: session.id }],
     },
   });
+
+  console.log('found payment row:', pay);
 
   if (!pay) {
     console.error(`No payment row for session ${session.id}`);
     return;
   }
 
-  if (
-    pay.stripeWebhookEventId === eventId &&
-    pay.status === PaymentStatus.PAID
-  ) {
-    return;
-  }
-
   const isPaid = session.payment_status === 'paid';
+  console.log('isPaid:', isPaid);
 
   await tx.payment.update({
     where: { id: pay.id },
@@ -294,10 +292,7 @@ const handleStripeWebhook = async (event: Stripe.Event) => {
 
       await prisma.payment.updateMany({
         where: {
-          OR: [
-            { checkoutSessionId: session.id },
-            { gatewayTxnId: session.id },
-          ],
+          OR: [{ checkoutSessionId: session.id }, { gatewayTxnId: session.id }],
         },
         data: { status: PaymentStatus.FAILED },
       });

@@ -24,11 +24,7 @@ const userHasPremiumStreamAccess = async (
   const now = new Date();
 
   const sub = await prisma.subscription.findUnique({ where: { userId } });
-  if (
-    sub?.status === PaymentStatus.PAID &&
-    sub.endDate &&
-    sub.endDate > now
-  ) {
+  if (sub?.status === PaymentStatus.PAID && sub.endDate && sub.endDate > now) {
     return true;
   }
 
@@ -164,7 +160,10 @@ const getMediaById = async (id: string, viewerUserId?: string) => {
 
   let streamUrl = media.streamUrl;
   if (media.pricingType === PricingType.PREMIUM) {
-    if (!viewerUserId || !(await userHasPremiumStreamAccess(viewerUserId, id))) {
+    if (
+      !viewerUserId ||
+      !(await userHasPremiumStreamAccess(viewerUserId, id))
+    ) {
       streamUrl = null;
     }
   }
@@ -193,11 +192,17 @@ const createMedia = async (payload: ICreateMediaPayload) => {
     );
   }
 
-  const purchasePrice = parseOptionalFloat(payload.purchasePrice, 'purchasePrice');
+  const purchasePrice = parseOptionalFloat(
+    payload.purchasePrice,
+    'purchasePrice',
+  );
   const rentalPrice = parseOptionalFloat(payload.rentalPrice, 'rentalPrice');
 
   let rentalDurationDays = 7;
-  if (payload.rentalDurationDays !== undefined && payload.rentalDurationDays !== '') {
+  if (
+    payload.rentalDurationDays !== undefined &&
+    payload.rentalDurationDays !== ''
+  ) {
     rentalDurationDays = parseInteger(
       payload.rentalDurationDays,
       'rentalDurationDays',
