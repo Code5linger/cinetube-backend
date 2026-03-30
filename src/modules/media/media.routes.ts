@@ -1,5 +1,9 @@
 import { Router } from 'express';
-import { optionalAuth, requireAuth, requireRole } from '../../middleware/auth.js';
+import {
+  optionalAuth,
+  requireAuth,
+  requireRole,
+} from '../../middleware/auth.js';
 import { MediaController } from './media.controller.js';
 import { Role } from '../../generated/prisma/index.js';
 

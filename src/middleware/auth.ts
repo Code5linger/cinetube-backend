@@ -64,6 +64,50 @@ export const requireAuth: RequestHandler = async (req, res, next) => {
   }
 };
 
+// export const requireAuth: RequestHandler = async (req, res, next) => {
+//   try {
+//     const headers = new Headers();
+
+//     // Priority 1: Bearer token from Authorization header
+//     const authHeader = req.headers.authorization;
+//     if (authHeader?.startsWith('Bearer ')) {
+//       const token = authHeader.slice(7);
+//       headers.set('cookie', `better-auth.session_token=${token}`);
+//     } else if (req.headers.cookie) {
+//       // Priority 2: Cookie header
+//       headers.set('cookie', req.headers.cookie);
+//     }
+
+//     const session = await auth.api.getSession({ headers });
+
+//     if (!session?.user) {
+//       res.status(401).json({ message: 'Unauthorized' });
+//       return;
+//     }
+
+//     const user = await prisma.user.findUnique({
+//       where: { id: session.user.id },
+//       select: userSelect,
+//     });
+
+//     if (!user) {
+//       res.status(401).json({ message: 'User not found' });
+//       return;
+//     }
+
+//     if (user.accountStatus === AccountStatus.BLOCKED) {
+//       res.status(403).json({ message: 'Account suspended' });
+//       return;
+//     }
+
+//     req.user = user;
+//     next();
+//   } catch (err) {
+//     console.error('requireAuth error:', err);
+//     res.status(401).json({ message: 'Invalid session' });
+//   }
+// };
+
 export const requireRole =
   (...roles: Role[]): RequestHandler =>
   (req, res, next) => {

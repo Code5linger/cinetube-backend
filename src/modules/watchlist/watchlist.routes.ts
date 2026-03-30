@@ -4,8 +4,7 @@ import { WatchlistController } from './watchlist.controller.js';
 
 const router = Router();
 
-// router.get('/', requireAuth, WatchlistController.getWatchlist);
-router.get('/', WatchlistController.getWatchlist);
+router.get('/', requireAuth, WatchlistController.getWatchlist);
 router.post('/:mediaId', requireAuth, WatchlistController.addToWatchlist);
 router.delete(
   '/:mediaId',

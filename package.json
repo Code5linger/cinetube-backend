@@ -12,7 +12,9 @@
     "migrate": "prisma migrate dev",
     "generate": "prisma generate",
     "push": "prisma push",
-    "pull": "prisma pull"
+    "pull": "prisma pull",
+    "stripe:webhook": "stripe listen --forward-to localhost:5000/webhook",
+    "stripe:trigger": "stripe trigger payment_intent.succeeded"
   },
   "repository": {
     "type": "git",

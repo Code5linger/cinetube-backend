@@ -1,3 +1,4 @@
+import type { Response as ExpressResponse } from 'express';
 import { prisma } from '../../lib/prisma.js';
 import { auth } from '../../lib/auth.js';
 import { AppError } from '../../utils/http.js';
@@ -8,32 +9,45 @@ import {
 } from './auth.interface.js';
 import { Role } from '../../generated/prisma/index.js';
 
-const register = async (payload: IRegisterPayload) => {
+const register = async (payload: IRegisterPayload, res: ExpressResponse) => {
   const { name, email, password } = payload;
 
   const data = await auth.api.signUpEmail({
     body: { name, email, password },
+    asResponse: true,
   });
 
-  if (!data.user) {
-    throw new AppError('Failed to register user', 400);
+  if (!data.ok) {
+    const err = (await data.json()) as { message?: string };
+    throw new AppError(err?.message ?? 'Failed to register user', 400);
   }
 
-  return data;
+  const setCookie = data.headers.get('set-cookie');
+  if (setCookie) {
+    res.setHeader('set-cookie', setCookie);
+  }
+
+  return data.json();
 };
 
-const login = async (payload: ILoginPayload) => {
+const login = async (payload: ILoginPayload, res: ExpressResponse) => {
   const { email, password } = payload;
 
   const data = await auth.api.signInEmail({
     body: { email, password },
+    asResponse: true,
   });
 
-  if (!data.user) {
+  if (!data.ok) {
     throw new AppError('Invalid credentials', 401);
   }
 
-  return data;
+  const setCookie = data.headers.get('set-cookie');
+  if (setCookie) {
+    res.setHeader('set-cookie', setCookie);
+  }
+
+  return data.json();
 };
 
 const getMe = async (userId: string) => {
@@ -80,9 +94,14 @@ const forgetPassword = async (email: string) => {
   const user = await prisma.user.findUnique({ where: { email } });
   if (!user) throw new AppError('User not found', 404);
 
-  await auth.api.sendVerificationEmail({
-    body: { email },
-  });
+  await fetch(
+    `${process.env.BETTER_AUTH_URL}/api/better-auth/forget-password`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, redirectTo: '/reset-password' }),
+    },
+  );
 };
 
 const resetPassword = async (token: string, newPassword: string) => {

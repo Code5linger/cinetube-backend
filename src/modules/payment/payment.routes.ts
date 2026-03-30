@@ -10,7 +10,18 @@ const router = Router();
 router.post('/webhook', PaymentController.handleStripeWebhook);
 
 // User routes
-router.post('/checkout', requireAuth, PaymentController.createCheckoutSession);
+router.post(
+  '/checkout',
+  (req, res, next) => {
+    console.log('=== payment/checkout headers ===');
+    console.log('cookie:', req.headers.cookie);
+    console.log('authorization:', req.headers.authorization);
+    next();
+  },
+  requireAuth,
+  PaymentController.createCheckoutSession,
+);
+
 router.post(
   '/title-checkout',
   requireAuth,

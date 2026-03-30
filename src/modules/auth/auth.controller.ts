@@ -8,16 +8,16 @@ import {
 } from './auth.interface.js';
 
 const register = asyncHandler(async (req: Request, res: Response) => {
-  const result = await AuthService.register(req.body as IRegisterPayload);
+  const result = await AuthService.register(req.body as IRegisterPayload, res);
   res.status(201).json({
     success: true,
-    message: 'Registered successfully. Please verify your email.',
+    message: 'Registered successfully',
     data: result,
   });
 });
 
 const login = asyncHandler(async (req: Request, res: Response) => {
-  const result = await AuthService.login(req.body as ILoginPayload);
+  const result = await AuthService.login(req.body as ILoginPayload, res);
   res.json({
     success: true,
     message: 'Logged in successfully',

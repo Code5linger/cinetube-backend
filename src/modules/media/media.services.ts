@@ -138,7 +138,14 @@ const getMediaById = async (id: string, viewerUserId?: string) => {
     where: { id },
     include: {
       reviews: {
-        where: { isPublished: true },
+        where: viewerUserId
+          ? {
+              OR: [
+                { isPublished: true },
+                { userId: viewerUserId, isPublished: false },
+              ],
+            }
+          : { isPublished: true },
         include: {
           user: { select: { id: true, name: true, email: true } },
           likes: { select: { userId: true } },
