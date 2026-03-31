@@ -4,24 +4,18 @@
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
     "ignoreDeprecations": "5.0",
-
-    "rootDir": "./",
+    "rootDir": "./src",
     "outDir": "./dist",
-
     "strict": true,
     "noUncheckedIndexedAccess": true,
     "exactOptionalPropertyTypes": true,
-
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true,
-
     "sourceMap": true,
-    "incremental": true,
     "resolveJsonModule": true,
-
     "types": ["node"]
   },
-  "include": ["src", "prisma.config.ts"],
-  "exclude": ["node_modules"]
+  "include": ["src"],
+  "exclude": ["node_modules", "dist", "prisma.config.ts"]
 }

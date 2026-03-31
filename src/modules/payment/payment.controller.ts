@@ -7,11 +7,15 @@ import {
   ICreateCheckoutSessionPayload,
   ICreateTitleCheckoutPayload,
 } from './payment.interface.js';
+// import {
+//   SubscriptionPlan,
+//   TitleAccessType,
+// } from '../../generated/prisma/index.js';
+import { stripe } from '../../config/stripe.js';
 import {
   SubscriptionPlan,
   TitleAccessType,
 } from '../../generated/prisma/index.js';
-import { stripe } from '../../config/stripe.js';
 
 const createCheckoutSession = asyncHandler(
   async (req: Request, res: Response) => {
