@@ -24,3 +24,5 @@ app.get('/', (req: Request, res: Response) => {
 });
 
 app.use('/api', rootRouter);
+
+export default app;
