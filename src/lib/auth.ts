@@ -31,23 +31,25 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: true,
     sendResetPassword: async ({ user, url }) => {
-      await fetch('https://api.resend.com/emails', {
+      const res = await fetch('https://api.resend.com/emails', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
         },
         body: JSON.stringify({
-          from: 'CineTube <noreply@yourdomain.com>',
+          from: 'CineTube <onboarding@resend.dev>', // ← use this for testing
           to: user.email,
           subject: 'Reset your password',
-          html: `
-          <p>Click the link below to reset your password:</p>
-          <a href="${url}">${url}</a>
-          <p>This link expires in 1 hour.</p>
-        `,
+          html: `<p>Reset your password:</p><a href="${url}">${url}</a>`,
         }),
       });
+
+      if (!res.ok) {
+        const err = await res.json();
+        console.error('Resend error:', err); // check Vercel runtime logs
+        throw new Error('Failed to send email');
+      }
     },
   },
 
