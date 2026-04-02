@@ -22,7 +22,7 @@ app.all('/api/better-auth/*splat', toNodeHandler(auth));
 
 app.post(
   '/api/payment/webhook',
-  express.raw({ type: 'application/json' }),
+  express.raw({ type: '*/*' }),
   PaymentController.handleStripeWebhook,
 );
 

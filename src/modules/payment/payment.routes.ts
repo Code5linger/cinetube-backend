@@ -7,7 +7,7 @@ const router = Router();
 
 // Webhook — must use raw body, registered BEFORE express.json()
 // This is mounted separately in app.ts
-router.post('/webhook', PaymentController.handleStripeWebhook);
+// router.post('/webhook', PaymentController.handleStripeWebhook);
 
 // User routes
 router.post(
