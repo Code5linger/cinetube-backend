@@ -16,3 +16,14 @@ router.use('/admin', AdminRoutes);
 router.use('/payment', PaymentRoutes);
 
 export const rootRouter = router;
+
+fetch(
+  'https://cinetube-frontend-5zoh.vercel.app//api/auth/forget-password',
+  {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email: 'test@test.com' }),
+  },
+)
+  .then((r) => r.text())
+  .then(console.log);

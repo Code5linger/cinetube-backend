@@ -30,6 +30,25 @@ export const auth = betterAuth({
 
   emailAndPassword: {
     enabled: true,
+    sendResetPassword: async ({ user, url }) => {
+      await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
+        },
+        body: JSON.stringify({
+          from: 'CineTube <noreply@yourdomain.com>',
+          to: user.email,
+          subject: 'Reset your password',
+          html: `
+          <p>Click the link below to reset your password:</p>
+          <a href="${url}">${url}</a>
+          <p>This link expires in 1 hour.</p>
+        `,
+        }),
+      });
+    },
   },
 
   socialProviders: {

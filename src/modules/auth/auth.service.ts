@@ -94,14 +94,12 @@ const forgetPassword = async (email: string) => {
   const user = await prisma.user.findUnique({ where: { email } });
   if (!user) throw new AppError('User not found', 404);
 
-  await fetch(
-    `${process.env.BETTER_AUTH_URL}/api/better-auth/forget-password`,
-    {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, redirectTo: '/reset-password' }),
+  await auth.api.requestPasswordReset({
+    body: {
+      email,
+      redirectTo: `${process.env.FRONTEND_URL}/reset-password`,
     },
-  );
+  });
 };
 
 const resetPassword = async (token: string, newPassword: string) => {
