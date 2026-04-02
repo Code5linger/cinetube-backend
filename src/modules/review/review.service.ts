@@ -225,6 +225,7 @@ const getPendingReviews = async () => {
     include: {
       user: { select: { id: true, name: true, email: true } },
       media: { select: { id: true, title: true } },
+      _count: { select: { likes: true, comments: true } },
     },
     orderBy: { createdAt: 'desc' },
   });
