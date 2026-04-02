@@ -72,6 +72,13 @@ const createTitleCheckoutSession = asyncHandler(
 const handleStripeWebhook = async (req: Request, res: Response) => {
   const signature = req.headers['stripe-signature'] as string;
 
+  // DEBUG — remove after fixing
+  console.log('webhook hit');
+  console.log('content-type:', req.headers['content-type']);
+  console.log('body type:', typeof req.body);
+  console.log('body is Buffer:', Buffer.isBuffer(req.body));
+  console.log('signature present:', !!signature);
+
   if (!signature) {
     res.status(400).json({ message: 'Missing Stripe signature' });
     return;
@@ -79,28 +86,22 @@ const handleStripeWebhook = async (req: Request, res: Response) => {
 
   let event;
   try {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     event = stripe.webhooks.constructEvent(
       req.body as Buffer,
       signature,
       config.STRIPE.WEBHOOK_SECRET,
     );
   } catch (err) {
-    console.error('Webhook signature verification failed:', err);
+    // DEBUG
+    console.error('constructEvent failed:', err);
+    console.error('body preview:', req.body?.toString?.().slice(0, 200));
     res.status(400).json({ message: 'Invalid Stripe webhook signature' });
     return;
   }
 
-  try {
-    const result = await PaymentService.handleStripeWebhook(event);
-    res.json({ success: true, message: 'Webhook processed', data: result });
-  } catch (err) {
-    console.error('Webhook handler error:', err);
-    res
-      .status(500)
-      .json({ success: false, message: 'Webhook processing failed' });
-  }
+  // ... rest unchanged
 };
-
 const getMyPayments = asyncHandler(async (req: Request, res: Response) => {
   const result = await PaymentService.getMyPayments(req.user!.id);
   res.json({
