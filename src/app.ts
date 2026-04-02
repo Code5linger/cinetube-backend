@@ -1,3 +1,4 @@
+import cors from 'cors';
 import express, { Application, Request, Response } from 'express';
 import cookieParser from 'cookie-parser';
 import { auth } from './lib/auth.js';
@@ -6,6 +7,16 @@ import { rootRouter } from './app/routes/index.js';
 import { PaymentController } from './modules/payment/payment.controller.js';
 
 const app: Application = express();
+
+app.use(
+  cors({
+    origin: [
+      'http://localhost:3000',
+      'https://cinetube-frontend-5zoh.vercel.app',
+    ],
+    credentials: true,
+  }),
+);
 
 app.all('/api/better-auth/*splat', toNodeHandler(auth));
 
