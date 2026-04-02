@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 import 'dotenv/config';
 import { defineConfig } from 'prisma/config';
 if (!process.env['DATABASE_URL']) {
